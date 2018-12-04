@@ -1,0 +1,220 @@
+static void vIC5HandlerTask( void *pvParameters)
+{
+    //Local variables.
+    unsigned int t_new, t_old = 0, t_diff;
+    static unsigned int con_buf[4];
+    int counter = 0;
+    float frequency_calc_constant = (16.0*FPB)/256.0;
+    float freq = 0, t_per_16_rev = 0;
+    char m_spd[8];
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_per_16_rev = t_per_16_rev + (t_new - t_old);
+        t_old = t_new;
+        if(counter >= 15)
+        {
+            freq = (frequency_calc_constant/(t_per_16_rev));
+            if(uxQueueMessagesWaiting(xMotorSpeedQueue)>=1)
+            {
+                xQueueReset(xMotorSpeedQueue);
+            }
+            xQueueSendToBack( xMotorSpeedQueue, &freq, 0);
+//            sprintf(m_spd,"%f",freq);
+//            m_spd[7] = NULL;
+//            LCD_puts(m_spd);
+            t_per_16_rev = 0;
+        }
+        counter = (counter+1)%16;
+        //Reenable IC interrupt.
+        INTEnable(INT_IC5, 1);
+    }
+}
+
+
+{
+    //Local variables.
+    unsigned short int t_new, t_old = 0, t_diff;
+    unsigned int con_buf[4];
+    float freq;
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_diff = t_new - t_old;
+        freq = FPB/(256.0*t_diff);
+        t_old = t_new;
+        if(uxQueueMessagesWaiting(xMotorSpeedQueue)>=1)
+        {
+            xQueueReset(xMotorSpeedQueue);
+        }
+        xQueueSendToBack( xMotorSpeedQueue, &freq, 0);     
+        //Reenable IC interrupt.
+        INTEnable(INT_IC5, 1);
+    }
+}
+
+static void vIC5HandlerTask( void *pvParameters)
+{
+    //Local variables.
+    unsigned short int t_new, t_old = 0, t_diff;
+    unsigned int con_buf[4];
+    double freq;
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_diff = t_new - t_old;
+        freq = FPB/(256*t_diff);
+        t_old = t_new;
+        if(uxQueueMessagesWaiting(xMotorSpeedQueue)>=1)
+        {
+            xQueueReset(xMotorSpeedQueue);
+        }
+        xQueueSendToBack( xMotorSpeedQueue, &freq, 0);     
+        //Reenable IC interrupt.
+        INTEnable(INT_IC5, 1);
+    }
+}
+
+static void vIC5HandlerTask( void *pvParameters)
+{
+    //Local variables.
+    unsigned int t_new, t_old = 0, t_diff;
+    static unsigned int con_buf[4];
+    int counter = 0;
+    float frequency_calc_constant = (16.0*FPB)/256.0;
+    float freq = 0, t_per_16_rev = 0;
+    char m_spd[8];
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_per_16_rev = t_per_16_rev + (t_new - t_old);
+        t_old = t_new;
+        if(counter >= 15)
+        {
+            freq = (frequency_calc_constant/(t_per_16_rev));
+            if(uxQueueMessagesWaiting(xMotorSpeedQueue)>=1)
+            {
+                xQueueReset(xMotorSpeedQueue);
+            }
+            xQueueSendToBack( xMotorSpeedQueue, &freq, 0);
+//            sprintf(m_spd,"%f",freq);
+//            m_spd[7] = NULL;
+//            LCD_puts(m_spd);
+            t_per_16_rev = 0;
+        }
+        counter = (counter+1)%16;
+        //Reenable IC interrupt.
+        INTEnable(INT_IC5, 1);
+    }
+}
+
+
+
+
+
+works:
+
+static void vIC5HandlerTask( void *pvParameters)
+{
+    //Local variables.
+    unsigned int t_new, t_old = 0, t_diff;
+    int t_per_16_rev = 0;
+    static unsigned int con_buf[4];
+    int counter = 0;
+    float frequency_calc_constant = (16.0*GetPeripheralClock())/256.0;
+    float freq = 0;
+    char m_spd[8];
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        counter = (counter+1)%16;
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_diff = t_new - t_old;
+        t_old = t_new;
+        freq = GetPeripheralClock()/(256*t_diff);
+        sprintf(m_spd,"%f",freq);
+        m_spd[7] = NULL;
+        LCD_puts(m_spd);
+        //Reenable IC interrupt.
+        mIC5ClearIntFlag();
+        INTEnable(INT_IC5, 1);
+    }
+}
+
+
+static void vIC5HandlerTask( void *pvParameters)
+{
+    //Local variables.
+    unsigned int t_new, t_old = 0, t_diff;
+    int t_per_16_rev = 0;
+    static unsigned int con_buf[4];
+    int counter = 0;
+    float frequency_calc_constant = (16.0*GetPeripheralClock())/256.0;
+    float freq = 0;
+    char m_spd[8];
+    //Clear semaphore on start of task.
+    xSemaphoreTake( xICBinarySemaphore , 0);
+    for( ;; )
+    {
+        //Wait here until xICBinarySempaphore is received.
+        xSemaphoreTake( xICBinarySemaphore , portMAX_DELAY);
+        LATBINV = LEDB;
+        //Calculate frequency and make available to IO unit.
+        ReadCapture5(con_buf);
+        t_new = con_buf[0];
+        t_diff = t_new - t_old;
+        t_per_16_rev = t_per_16_rev + t_diff;
+        t_old = t_new;
+        counter = (counter+1)%16;
+        if(counter == 15)
+        {
+            freq = GetPeripheralClock()/(16.0*t_diff);
+            if(uxQueueMessagesWaiting(xMotorSpeedQueue)>=1)
+            {
+                xQueueReset(xMotorSpeedQueue);
+            }
+            xQueueSendToBack( xMotorSpeedQueue, &freq, 0);
+            t_per_16_rev = 0;
+//            sprintf(m_spd,"%f",freq);
+//            m_spd[7] = NULL;
+//            LCD_puts(m_spd);
+        }
+        //Reenable IC interrupt.
+        mIC5ClearIntFlag();
+        INTEnable(INT_IC5, 1);
+    }
+}

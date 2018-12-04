@@ -1,0 +1,19 @@
+//void __ISR(_INPUT_CAPTURE_5_VECTOR, IPL3) Capture5(void)
+//{
+//    //variables
+//    static unsigned int con_buf[4];
+//    static unsigned short int t_new, t_old = 0, time_diff;
+//
+//    read capture into buffer
+//    ReadCapture5(con_buf);
+//    t_new = con_buf[0];
+//    time_diff = t_new - t_old;      //number of samples taken since the previous sample
+//    t_old = t_new;
+//    if(buf_index >= 16)
+//        buf_index = 0;
+//    freq_buf1[buf_index] = FPB/(256*time_diff);
+//    buf_index++;
+//
+//Exit ISR.
+//mIC5ClearIntFlag();
+//}
